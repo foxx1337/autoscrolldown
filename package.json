@@ -11,22 +11,32 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.sayHello",
-        "onCommand:extension.autoscrollDown"
+        "*"
     ],
     "main": "./out/extension",
     "contributes": {
         "commands": [
             {
-                "command": "extension.sayHello",
-                "title": "Hello World"
-            },
-            {
                 "command": "extension.autoscrollDown",
-                "title": "Toggle autoscroll current file to end",
+                "title": "Toggle autoscroll To End For Current File",
                 "category": "autoscrolldown"
             }
-        ]
+        ],
+        "configuration":{
+            "title": "autoscrolldown configuration",
+            "properties": {
+                "autoscrolldown.allFiles": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Automatically scroll down to the end of all externally modified files."
+                },
+                "autoscrolldown.onlyWhenAtEnd": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "When autoscrolling, the externally modified document only scrolls to end if the cursor was already at the end."
+                }
+            }
+        }
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",

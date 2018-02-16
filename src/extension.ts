@@ -29,31 +29,39 @@ export class Autoscroller {
     private _disponsable: vscode.Disposable;
     private _watchedFiles: Set<string>;
     private _statusBarItem: vscode.StatusBarItem;
+    private _focused: boolean;
+    private _atEndOfDocument: boolean;
 
     constructor() {
         this._watchedFiles = new Set<string>();
+        this._focused = true;
+        this._atEndOfDocument = false;
 
-        let subscriptions: vscode.Disposable[] = [];
-        vscode.window.onDidChangeActiveTextEditor(this._onDocumentSwitched, this, subscriptions);
+        const subscriptions: vscode.Disposable[] = [];
+        vscode.window.onDidChangeWindowState(this._onFocusChanged, this, subscriptions);
+        vscode.window.onDidChangeActiveTextEditor(this._onChangeActiveTextEditor, this, subscriptions);
+        vscode.window.onDidChangeTextEditorSelection(this._onSelectionChanged, this, subscriptions)
         vscode.workspace.onDidChangeTextDocument(this._onDocumentChanged, this, subscriptions);
 
         this._disponsable = vscode.Disposable.from(...subscriptions);
     }
 
-    public watch(file: string) {
-        this._watchedFiles.add(file);
+    public watch(fileName: string) {
+        this._watchedFiles.add(fileName);
     }
 
-    public unwatch(file: string) {
-        this._watchedFiles.delete(file);
+    public unwatch(fileName: string) {
+        this._watchedFiles.delete(fileName);
     }
 
-    public toggleWatch(file: string) {
-        if (this._watchedFiles.has(file)) {
-            this.unwatch(file);
-            this._hideStatusBar();
+    public toggleWatch(fileName: string) {
+        if (this._watchedFiles.has(fileName)) {
+            this.unwatch(fileName);
+            if (!this._isAlwaysAutoscroll()) {
+                this._hideStatusBar();
+            }
         } else {
-            this.watch(file);
+            this.watch(fileName);
             this._showStatusBar();
         }
     }
@@ -61,11 +69,17 @@ export class Autoscroller {
     private _showStatusBar() {
         if (!this._statusBarItem) {
             this._statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
-            this._statusBarItem.tooltip = 'autoscrolldown to end of file on change';
-            this._statusBarItem.command = 'extension.autoscrollDown';    
+            this._statusBarItem.text = `$(arrow-down)`;
         }
 
-        this._statusBarItem.text = `$(arrow-down)`;
+        if (this._isAlwaysAutoscroll()) {
+            this._statusBarItem.tooltip = 'autoscrolldown: ready to scroll to the end of the file on change (global)';
+            this._statusBarItem.command = undefined;
+        } else {
+            this._statusBarItem.tooltip = 'autoscrolldown: ready to scroll to the end of the file on change (toggle)'
+            this._statusBarItem.command = 'extension.autoscrollDown';            
+        }
+
         this._statusBarItem.show();
     }
 
@@ -76,27 +90,63 @@ export class Autoscroller {
     }
 
     private _onDocumentChanged(e: vscode.TextDocumentChangeEvent) {
-        let changedName = e.document.fileName;
-        let currentName = vscode.window.activeTextEditor.document.fileName;
-        if (this._watchedFiles.has(changedName) && changedName === currentName) {
+        const changedName = e.document.fileName;
+        const currentName = vscode.window.activeTextEditor.document.fileName;
+        if (!this._focused && this._isAutoscrollable(changedName) && changedName === currentName) {
             this._scrollActiveEditorToEnd();
         }
     }
 
-    private _onDocumentSwitched(e: vscode.TextEditor) {
-        if (this._watchedFiles.has(e.document.fileName)) {
+    private _onFocusChanged(e: vscode.WindowState) {
+        this._focused = e.focused;
+    }
+
+    private _onChangeActiveTextEditor(e: vscode.TextEditor) {
+        this._statusBarItem.hide();
+    }
+
+    private _onSelectionChanged(e: vscode.TextEditorSelectionChangeEvent) {
+        const document = vscode.window.activeTextEditor.document;
+        const selectionEnd  = e.selections[0].end;
+        const endPosition = document.lineAt(document.lineCount - 1).range.end
+        if (selectionEnd.isAfterOrEqual(endPosition)) {
+            this._atEndOfDocument = true;
+        } else {
+            this._atEndOfDocument = false;
+        }
+
+        if (this._isAutoscrollable(document.fileName)) {
             this._showStatusBar();
         } else {
             this._hideStatusBar();
         }
     }
 
+    private _isAutoscrollable(fileName: string): boolean {
+        return (this._isAlwaysAutoscroll() || this._watchedFiles.has(fileName))
+            && (this._atEndOfDocument || !this._hasToBeAtTheEnd());
+    }
+
     private _scrollActiveEditorToEnd() {
-        let editor = vscode.window.activeTextEditor;
-        let lineCount = editor.document.lineCount;
-        let range = editor.document.lineAt(lineCount - 1).range;
-        editor.selection = new vscode.Selection(range.start, range.end);
+        const editor = vscode.window.activeTextEditor;
+        const lineCount = editor.document.lineCount;
+        const range = editor.document.lineAt(lineCount - 1).range;
+        editor.selection = new vscode.Selection(range.end, range.end);
         editor.revealRange(range);
+    }
+
+    private _getConfig(): vscode.WorkspaceConfiguration {
+        return vscode.workspace.getConfiguration('autoscrolldown');
+    }
+
+    private _isAlwaysAutoscroll(): boolean {
+        const settings = this._getConfig();
+        return settings.get('allFiles', false);
+    }
+
+    private _hasToBeAtTheEnd(): boolean {
+        const settings = this._getConfig();
+        return settings.get('onlyWhenAtEnd', true);
     }
 
     dispose() {
