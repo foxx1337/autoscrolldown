@@ -4,7 +4,9 @@ This Visual Studio Code extension automatically scrolls externally modified file
 
 ## Features
 
-Simply enable the `autoscrolldown` settings in the config or run the command. For example with the command:
+Simply enable the `autoscrolldown` settings in the config or run the command.
+
+An example of how the command performs:
 
 ![autoscroll example](images/autoscrolldown.gif)
 
