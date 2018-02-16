@@ -57,12 +57,14 @@ export class Autoscroller {
     public toggleWatch(fileName: string) {
         if (this._watchedFiles.has(fileName)) {
             this.unwatch(fileName);
-            if (!this._isAlwaysAutoscroll()) {
-                this._hideStatusBar();
-            }
         } else {
             this.watch(fileName);
+        }
+
+        if (this._isAutoscrollable(fileName)) {
             this._showStatusBar();
+        } else {
+            this._hideStatusBar();
         }
     }
 
