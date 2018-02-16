@@ -1,9 +1,14 @@
 {
     "name": "autoscrolldown",
-    "displayName": "autoscrollDown",
-    "description": "Scrolls the active editor to the end upon reloading.",
-    "version": "0.0.1",
+    "displayName": "autoscrolldown",
+    "description": "Keeps externally modified files scrolled to the last line.",
+    "version": "1.0.0",
     "publisher": "foxx1337",
+    "homepage": "https://github.com/foxx1337/autoscrolldown",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/foxx1337/autoscrolldown.git"
+    },
     "engines": {
         "vscode": "^1.19.0"
     },

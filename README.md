@@ -1,65 +1,40 @@
 # autoscrolldown README
 
-This is the README for your extension "autoscrolldown". After writing up a brief description, we recommend including the following sections.
+This Visual Studio Code extension automatically scrolls externally modified files to the end. By default, Code just reloads these files; with `autoscrolldown` they also scroll to the last line if certain conditions are met.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+Simply enable the `autoscrolldown` settings in the config or run the command. For example with the command:
 
-For example if there is an image subfolder under your extension project workspace:
+![autoscroll example](images/autoscrolldown.gif)
 
-\!\[feature X\]\(images/feature-x.png\)
+You'll know the feature is active when you see the "arrow-down" indicator in the status bar:
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+![autoscroll indicator](images/indicator.png)
+
+Depending on the `onlyWhenAtEnd` setting, sometimes it's necessary to be at the very end of the buffer for the indicator to appear and the extension to do its job.
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+Visual Studio Code newer than 1.19.0.
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
 This extension contributes the following settings:
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+* `autoscrolldown.allFiles`: all files scroll automatically to the end when modified externally
+* `autoscrolldown.onlyWhenAtEnd`: scrolling happens only if the cursor was already in the last position within the file
+
+There is also one command available, useful when `autoscrolldown.allFiles` is turned off:
+
+* `autoscrolldown: Toggle autoscroll To End For Current File`
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+None yet.
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
-
 ### 1.0.0
 
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on OSX or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on OSX or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (OSX) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+Initial release of autoscrolldown.
