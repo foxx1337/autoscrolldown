@@ -2,7 +2,7 @@
     "name": "autoscrolldown",
     "displayName": "autoscrolldown",
     "description": "Keeps externally modified files scrolled to the last line.",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "publisher": "foxx1337",
     "homepage": "https://github.com/foxx1337/autoscrolldown",
     "repository": {
@@ -53,6 +53,7 @@
     "devDependencies": {
         "typescript": "^2.6.1",
         "vscode": "^1.1.6",
+        "tslint": "^5.8.0",
         "@types/node": "^7.0.43",
         "@types/mocha": "^2.2.42"
     }

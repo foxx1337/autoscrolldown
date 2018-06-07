@@ -1,7 +1,7 @@
-# Change Log
-All notable changes to the "autoscrolldown" extension will be documented in this file.
+# autoscrolldown Change Log
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+## Version 1.0.1: June 07, 2018
+- Update js/ts dependencies
 
-## [Unreleased]
-- Initial release
+## Version 1.0.0: February 17, 2018
+- Create initial release with whole functionality
