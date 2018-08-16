@@ -94,7 +94,7 @@ export class Autoscroller {
     private _onDocumentChanged(e: vscode.TextDocumentChangeEvent) {
         const changedName = e.document.fileName;
         const currentName = vscode.window.activeTextEditor.document.fileName;
-        if (!this._focused && this._isAutoscrollable(changedName) && changedName === currentName) {
+        if ((this._hasAutoscrollActive() || !this._focused) && this._isAutoscrollable(changedName) && changedName === currentName) {
             this._scrollActiveEditorToEnd();
         }
     }
@@ -149,6 +149,11 @@ export class Autoscroller {
     private _hasToBeAtTheEnd(): boolean {
         const settings = this._getConfig();
         return settings.get('onlyWhenAtEnd', true);
+    }
+
+    private _hasAutoscrollActive(): boolean {
+        const settings = this._getConfig();
+        return settings.get('alsoAutoscrollActive', false);
     }
 
     dispose() {

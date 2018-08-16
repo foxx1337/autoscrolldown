@@ -39,6 +39,11 @@
                     "type": "boolean",
                     "default": true,
                     "description": "When autoscrolling, the externally modified document only scrolls to end if the cursor was already at the end."
+                },
+                "autoscrolldown.alsoAutoscrollActive": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Also scrolls down the document when vscode is active. Enabling might be weird as the cursor will \"run from under your feet\"."
                 }
             }
         }
