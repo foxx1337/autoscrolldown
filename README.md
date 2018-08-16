@@ -34,9 +34,3 @@ There is also one command available, useful when `autoscrolldown.allFiles` is tu
 ## Known Issues
 
 None yet.
-
-## Release Notes
-
-### 1.0.1
-
-Update js/ts dependencies for security reasons.
