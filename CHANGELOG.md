@@ -1,5 +1,8 @@
 # autoscrolldown Change Log
 
+## Version 1.0.5: September 18, 2018
+- Update js/ts dependencies
+
 ## Version 1.0.4: August 16, 2018
 - Add `autoscrolldown.alsoAutoscrollActive` option: will scroll the currently focused buffer on file change.
 
