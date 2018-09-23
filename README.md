@@ -26,6 +26,8 @@ This extension contributes the following settings:
 
 * `autoscrolldown.allFiles`: all files scroll automatically to the end when modified externally
 * `autoscrolldown.onlyWhenAtEnd`: scrolling happens only if the cursor was already in the last position within the file
+* `autoscrolldown.alsoAutoscrollActive`: if Code has focus and the current buffer meets the requirements to be autoscrolled,
+scroll it. This setting might lead to confusion while editing a file, as it might move things around.
 
 There is also one command available, useful when `autoscrolldown.allFiles` is turned off:
 
