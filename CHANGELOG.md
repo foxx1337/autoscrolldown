@@ -1,5 +1,8 @@
 # autoscrolldown Change Log
 
+## Version 1.0.6: May 4th, 2020
+- Update js/ts dependencies
+
 ## Version 1.0.5: September 18, 2018
 - Update js/ts dependencies
 
