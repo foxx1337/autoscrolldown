@@ -19,7 +19,11 @@ export function activate(context: vscode.ExtensionContext) {
     // Now provide the implementation of the command with  registerCommand
     // The commandId parameter must match the command field in package.json
     let autoscrollCurrent = vscode.commands.registerCommand('extension.autoscrollDown', () => {
-        autoscroller.toggleWatch(vscode.window.activeTextEditor.document.fileName);
+        if (vscode.window.activeTextEditor) {
+            autoscroller.toggleWatch(vscode.window.activeTextEditor.document.fileName);
+        } else {
+            vscode.window.showWarningMessage('Active text editor not found.');
+        }
     });
 
     context.subscriptions.push(autoscrollCurrent);
@@ -40,7 +44,7 @@ export class Autoscroller {
         const subscriptions: vscode.Disposable[] = [];
         vscode.window.onDidChangeWindowState(this._onFocusChanged, this, subscriptions);
         vscode.window.onDidChangeActiveTextEditor(this._onChangeActiveTextEditor, this, subscriptions);
-        vscode.window.onDidChangeTextEditorSelection(this._onSelectionChanged, this, subscriptions)
+        vscode.window.onDidChangeTextEditorSelection(this._onSelectionChanged, this, subscriptions);
         vscode.workspace.onDidChangeTextDocument(this._onDocumentChanged, this, subscriptions);
 
         this._disponsable = vscode.Disposable.from(...subscriptions);
@@ -78,8 +82,8 @@ export class Autoscroller {
             this._statusBarItem.tooltip = 'autoscrolldown: ready to scroll to the end of the file on change (global)';
             this._statusBarItem.command = undefined;
         } else {
-            this._statusBarItem.tooltip = 'autoscrolldown: ready to scroll to the end of the file on change (toggle)'
-            this._statusBarItem.command = 'extension.autoscrollDown';            
+            this._statusBarItem.tooltip = 'autoscrolldown: ready to scroll to the end of the file on change (toggle)';
+            this._statusBarItem.command = 'extension.autoscrollDown';
         }
 
         this._statusBarItem.show();
@@ -104,13 +108,15 @@ export class Autoscroller {
     }
 
     private _onChangeActiveTextEditor(e: vscode.TextEditor) {
-        this._statusBarItem.hide();
+        if (this._statusBarItem) {
+            this._statusBarItem.hide();
+        }
     }
 
     private _onSelectionChanged(e: vscode.TextEditorSelectionChangeEvent) {
         const document = vscode.window.activeTextEditor.document;
-        const selectionEnd  = e.selections[0].end;
-        const endPosition = document.lineAt(document.lineCount - 1).range.end
+        const selectionEnd = e.selections[0].end;
+        const endPosition = document.lineAt(document.lineCount - 1).range.end;
         if (selectionEnd.isAfterOrEqual(endPosition)) {
             this._atEndOfDocument = true;
         } else {
