@@ -18,7 +18,7 @@ Depending on the `onlyWhenAtEnd` setting, sometimes it's necessary to be at the 
 
 ## Requirements
 
-Visual Studio Code newer than 1.19.0.
+Visual Studio Code newer than 1.58.0.
 
 ## Extension Settings
 
