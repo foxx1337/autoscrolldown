@@ -2,7 +2,7 @@
     "name": "autoscrolldown",
     "displayName": "autoscrolldown",
     "description": "Keeps externally modified files scrolled to the last line.",
-    "version": "1.1.1",
+    "version": "1.2.0",
     "publisher": "foxx1337",
     "homepage": "https://github.com/foxx1337/autoscrolldown",
     "repository": {
