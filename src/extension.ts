@@ -32,14 +32,31 @@ export function activate(context: vscode.ExtensionContext) {
 export class Autoscroller {
     private _disponsable: vscode.Disposable;
     private _watchedFiles: Set<string>;
+    private _backgroundWatchedFiles: Set<string>;
+    private _currentFile: string;
     private _statusBarItem: vscode.StatusBarItem;
     private _focused: boolean;
     private _atEndOfDocument: boolean;
 
     constructor() {
         this._watchedFiles = new Set<string>();
+        this._backgroundWatchedFiles = new Set<string>();
+
+        const editor = vscode.window.activeTextEditor;
+        const document = editor?.document;
+
+        this._currentFile = document?.fileName;
         this._focused = true;
-        this._atEndOfDocument = false;
+
+        // Display the initial autoscrolldown status bar arrow.
+        const selectionEnd = editor?.selections[0].end;
+        const endPosition = document?.lineAt(document.lineCount - 1).range.end;
+        this._atEndOfDocument = selectionEnd?.isAfterOrEqual(endPosition);
+        if (this._isAutoscrollable(this._currentFile)) {
+            this._showStatusBar();
+        } else {
+            this._hideStatusBar();
+        }
 
         const subscriptions: vscode.Disposable[] = [];
         vscode.window.onDidChangeWindowState(this._onFocusChanged, this, subscriptions);
@@ -98,8 +115,15 @@ export class Autoscroller {
     private _onDocumentChanged(e: vscode.TextDocumentChangeEvent) {
         const changedName = e.document.fileName;
         const currentName = vscode.window.activeTextEditor.document.fileName;
-        if ((this._hasAutoscrollActive() || !this._focused) && this._isAutoscrollable(changedName) && changedName === currentName) {
+        
+        // When switching the tab back will always scroll into view a document that previously autoscrolled
+        const returningToWatched = this._backgroundWatchedFiles.has(changedName);
+        
+        if ((this._hasAutoscrollActive() || returningToWatched || !this._focused) && this._isAutoscrollable(changedName) && changedName === currentName) {
             this._scrollActiveEditorToEnd();
+            if (returningToWatched) {
+                this._backgroundWatchedFiles.delete(changedName);
+            }
         }
     }
 
@@ -111,17 +135,19 @@ export class Autoscroller {
         if (this._statusBarItem) {
             this._statusBarItem.hide();
         }
+        if (this._isAutoscrollable(this._currentFile)) {
+            this._backgroundWatchedFiles.add(this._currentFile);
+        }
+        if (e?.document.fileName) {
+            this._currentFile = e.document.fileName;
+        }
     }
 
     private _onSelectionChanged(e: vscode.TextEditorSelectionChangeEvent) {
         const document = vscode.window.activeTextEditor.document;
         const selectionEnd = e.selections[0].end;
         const endPosition = document.lineAt(document.lineCount - 1).range.end;
-        if (selectionEnd.isAfterOrEqual(endPosition)) {
-            this._atEndOfDocument = true;
-        } else {
-            this._atEndOfDocument = false;
-        }
+        this._atEndOfDocument = selectionEnd.isAfterOrEqual(endPosition);
 
         if (this._isAutoscrollable(document.fileName)) {
             this._showStatusBar();
@@ -158,6 +184,11 @@ export class Autoscroller {
     }
 
     private _hasAutoscrollActive(): boolean {
+        if (this._backgroundWatchedFiles.has(this._currentFile)) {
+            // Switching back to an autoscroll tab whose document has changed in the meanwhile.
+            this._backgroundWatchedFiles.delete(this._currentFile);
+            return true;
+        }
         const settings = this._getConfig();
         return settings.get('alsoAutoscrollActive', false);
     }
